@@ -1,38 +1,69 @@
-require('dotenv').config()
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
 
 const express = require('express')
 const app = express()
-const jwt = require('jsonwebtoken')
-
 app.use(express.json())
 
-const posts = [
-  {
-    username: 'Kyle',
-    title: 'Post 1'
-  },
-  {
-    username: 'Jim',
-    title: 'Post 2'
-  },
-]
+app.post('/users', async (req, res) => {
+  const { name, email, phone } = req.body
 
-const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
+  if (!name || !email || !phone ) {
+    const fields = []
+    res.statusCode = 400
+    
+    if (!name) fields.push('name')
+    if (!email) fields.push('email')
+    if (!phone) fields.push('phone')
 
-  if (token === null) return res.sendStatus(401)
+    return res.send({
+      error: `Cannot found [${fields.map((field, i) => i ? ' ' + field : field)}] field${fields.length > 1 ? 's' : ''}!`
+    })
+  }
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
-    if (err) return res.sendStatus(403)
-
-    req.user = user
-    next()
+  const newUser = await prisma.user.create({
+    data: {
+      name,
+      email,
+      phone
+    }
   })
-}
 
-app.get('/posts', authenticateToken, (req, res) => {
-  res.json(posts.filter((post) => post.username === req.user.name))
+  return res.send(newUser)
+})
+
+app.delete('/users', async (req, res) => {
+  const { id } = req.body
+
+  if (typeof id !== 'string') {
+    res.statusCode = 400
+    
+    return res.send({
+      error: `Wrong type of id. Should be string!`
+    })
+  }
+
+  if (!id) {
+    res.statusCode = 400
+    
+    return res.send({
+      error: `Cannot found id!`
+    })
+  }
+
+  const deletedUser = await prisma.user.deleteMany({
+    where: { id }
+  })
+
+  if (!deletedUser.count) {
+    res.statusCode = 400
+
+    return res.send({
+      error: `Cannot found user!`
+    })
+  }
+  
+  return res.send({ id })
 })
 
 app.listen(5000)
