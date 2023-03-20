@@ -9,7 +9,7 @@ app.get('/users', async (req, res) => {
   })
 })
 
-app.delete('/users', async (req, res) => {
+app.post('/users', async (req, res) => {
   return res.send({
     method: 'DELETE',
     endpoint: '/users'
