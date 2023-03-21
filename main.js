@@ -1,8 +1,7 @@
-const connectDb = require('./database')
+const conn = require('./database')
 const express = require('express')
 const app = express()
 
-const conn = connectDb()
 app.use(express.json())
 
 app.get('/users', (_, res) => {
