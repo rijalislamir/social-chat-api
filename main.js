@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require('uuid');
 const conn = require('./database')
 const express = require('express')
 const app = express()
@@ -23,18 +24,20 @@ app.get('/users', (_, res) => {
 })
 
 app.post('/users', (req, res) => {
-  const { name } = req.body
+  const { name, email } = req.body
 
-  if (!name) {
+  if (!name || !email) {
     res.statusCode = 400
 
     return res.send({
       status: 'failed',
-      message: 'Required a name!'
+      message: 'Required both name and email!'
     })
   }
 
-  conn.query(`INSERT INTO users SET ?`, { name }, (err, result) => {
+  const id = uuidv4()
+
+  conn.query(`INSERT INTO users SET ?`, { id, name, email }, (err, result) => {
     if (err) {
       res.statusCode = 400
 
@@ -47,8 +50,9 @@ app.post('/users', (req, res) => {
     return res.send({
       status: 'success',
       user: {
-        id: result.insertId,
-        name
+        id,
+        name,
+        email
       }
     })
   })
@@ -56,18 +60,18 @@ app.post('/users', (req, res) => {
 
 app.put('/users/:id', async (req, res) => {
   const { id } = req.params
-  const { name } = req.body
+  const { name, email } = req.body
 
-  if (!name) {
+  if (!name || !email) {
     res.statusCode = 400
 
     return res.send({
       status: 'failed',
-      message: 'Required a name!'
+      message: 'Required both name and email!'
     })
   }
 
-  conn.query('UPDATE users SET ? WHERE ?', [{ name }, { id }], (err, result) => {
+  conn.query('UPDATE users SET ? WHERE ?', [{ name, email }, { id }], (err, result) => {
     if (err) {
       res.statusCode = 400
 
@@ -91,7 +95,8 @@ app.put('/users/:id', async (req, res) => {
       status: 'success',
       user: {
         id,
-        name
+        name,
+        email
       }
     })
   })
