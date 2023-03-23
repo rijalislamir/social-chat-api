@@ -20,6 +20,25 @@ const getAllUsers = (_, res) => {
   })
 }
 
+const getUser = (req, res) => {
+  conn.query(`SELECT * FROM users WHERE ? LIMIT 1`, { id: req.user.id }, (err, result) => {
+    if (err) {
+      res.status(400).send({
+        status: 'failed',
+        message: err
+      })
+    }
+
+    const user = result[0]
+    delete user.password
+
+    return res.send({
+      status: 'success',
+      user
+    })
+  })
+}
+
 const createUser = async (req, res) => {
   try {
     const { name, email, password } = req.body
@@ -145,6 +164,7 @@ const deleteUser = (req, res) => {
 
 module.exports = {
   getAllUsers,
+  getUser,
   createUser,
   updateUser,
   deleteUser
