@@ -30,7 +30,7 @@ const getUser = (req, res) => {
     }
 
     const user = result[0]
-    delete user.password
+    if (user) delete user.password
 
     return res.send({
       status: 'success',
