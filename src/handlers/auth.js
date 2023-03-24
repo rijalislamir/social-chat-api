@@ -8,7 +8,7 @@ const login = (req, res) => {
 
     if (!email || !password) {
       return res.status(400).send({
-        status: 'failed',
+        success: false,
         message: 'Required both email and password!'
       })
     }
@@ -16,14 +16,14 @@ const login = (req, res) => {
     conn.query('SELECT * FROM users WHERE ?', { email }, async (err, result) => {
       if (err) {
         return res.status(400).send({
-          status: 'failed',
+          success: false,
           message: err
         })
       }
 
       if (!result.length) {
         return res.status(400).send({
-          status: 'failed',
+          success: false,
           message: 'Email not registered!'
         })
       }
@@ -40,19 +40,19 @@ const login = (req, res) => {
         const accessToken = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' })
 
         return res.send({
-          status: 'success',
+          success: true,
           accessToken
         })
       }
   
       return res.status(400).send({
-        status: 'failed',
+        success: false,
         message: 'Invalid credentials!'
       })
     })
   } catch (error) {
     return res.status(400).send({
-      status: 'failed',
+      success: false,
       message: error
     })
   }

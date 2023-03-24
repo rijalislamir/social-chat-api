@@ -8,13 +8,13 @@ const getAllUsers = (_, res) => {
       res.statusCode = 400
 
       res.send({
-        status: 'failed',
+        success: false,
         message: err
       })
     }
     
     return res.send({
-      status: 'success',
+      success: true,
       users
     })
   })
@@ -24,7 +24,7 @@ const getUser = (req, res) => {
   conn.query(`SELECT * FROM users WHERE ? LIMIT 1`, { id: req.user.id }, (err, result) => {
     if (err) {
       res.status(400).send({
-        status: 'failed',
+        success: false,
         message: err
       })
     }
@@ -33,7 +33,7 @@ const getUser = (req, res) => {
     if (user) delete user.password
 
     return res.send({
-      status: 'success',
+      success: true,
       user
     })
   })
@@ -45,7 +45,7 @@ const createUser = async (req, res) => {
   
     if (!name || !email || !password) {
       return res.status(400).send({
-        status: 'failed',
+        success: false,
         message: 'Required name, email, and password field!'
       })
     }
@@ -61,19 +61,19 @@ const createUser = async (req, res) => {
     conn.query(`INSERT INTO users SET ?`, user, (err) => {
       if (err) {  
         return res.status(400).send({
-          status: 'failed',
+          success: false,
           message: err
         })
       }
       
       return res.status(201).send({
-        status: 'success',
+        success: true,
         user
       })
     })
   } catch (error) {
     return res.status(400).send({
-      status: 'failed',
+      success: false,
       message: error
     })
   }
@@ -84,7 +84,7 @@ const updateUser = (req, res) => {
   const { name } = req.body
 
   if (id !== req.user.id) return res.status(403).send({
-    status: 'failed',
+    success: false,
     message: 'Forbidden!'
   })
 
@@ -92,7 +92,7 @@ const updateUser = (req, res) => {
     res.statusCode = 400
 
     return res.send({
-      status: 'failed',
+      success: false,
       message: 'Required a name!'
     })
   }
@@ -102,7 +102,7 @@ const updateUser = (req, res) => {
       res.statusCode = 400
 
       return res.send({
-        status: 'failed',
+        success: false,
         message: err
       })
     }
@@ -111,14 +111,14 @@ const updateUser = (req, res) => {
       res.statusCode = 400
 
       return res.send({
-        status: 'failed',
+        success: false,
         message: 'User not found!'
       })
     }
 
 
     return res.send({
-      status: 'success',
+      success: true,
       user: {
         id,
         name,
@@ -132,7 +132,7 @@ const deleteUser = (req, res) => {
   const { id } = req.params
 
   if (id !== req.user.id) return res.status(403).send({
-    status: 'failed',
+    success: false,
     message: 'Forbidden!'
   })
 
@@ -141,7 +141,7 @@ const deleteUser = (req, res) => {
       res.statusCode = 400
 
       return res.send({
-        status: 'failed',
+        success: false,
         message: err
       })
     }
@@ -150,13 +150,13 @@ const deleteUser = (req, res) => {
       res.statusCode = 400
 
       return res.send({
-        status: 'failed',
+        success: false,
         message: 'User not found!'
       })
     }
 
     return res.send({
-      status: 'success',
+      success: true,
       id
     })
   })
