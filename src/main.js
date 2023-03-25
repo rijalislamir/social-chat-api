@@ -22,11 +22,39 @@ const io = new Server(
 app.use(cors())
 app.use(express.json())
 
+io.use((socket, next) => {
+  const email = socket.handshake.auth.email;
+  if (!email) {
+    return next(new Error("invalid email"));
+  }
+  socket.email = email;
+  next();
+});
+
 io.on('connection', (socket) => {
-  console.log('a user connected');
+  const users = [];
+  for (let [id, socket] of io.of("/").sockets) {
+    users.push({
+      userID: id,
+      email: socket.email,
+    });
+  }
+  socket.emit("users", users);
+  
+  socket.broadcast.emit("newUser", {
+    userID: socket.id,
+    email: socket.email,
+  });
+  
+  console.log('user CONNECTED');
 
   socket.on('disconnect', () => {
-    console.log('user disconnected');
+    socket.broadcast.emit("exitUser", {
+      userID: socket.id,
+      email: socket.email,
+    });
+
+    console.log('user DISCONNECTED');
   });
 });
 
