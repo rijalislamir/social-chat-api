@@ -14,29 +14,31 @@ const initializeSocketIO = (server) => {
   io.use((socket, next) => {
     const email = socket.handshake.auth.email;
     const name = socket.handshake.auth.name;
+
     if (!email) {
       return next(new Error("invalid email"));
     }
+
     socket.email = email;
     socket.name = name;
     next();
   });
   
-  let connectedUsers = {}
+  let usersSockets = {}
   
   io.on('connection', (socket) => {
-    connectedUsers[socket.email] = socket
+    usersSockets[socket.email] = socket
 
-    console.log(Object.keys(connectedUsers))
+    console.log(Object.keys(usersSockets))
     
-    const users = [];
+    const onlineUsers = [];
     for (let [id, socket] of io.of("/").sockets) {
-      users.push({
+      onlineUsers.push({
         userID: id,
         email: socket.email,
       });
     }
-    socket.emit("users", users);
+    socket.emit("onlineUsers", onlineUsers);
     
     socket.broadcast.emit("newUser", {
       userID: socket.id,
@@ -47,9 +49,9 @@ const initializeSocketIO = (server) => {
   
     socket.on('sendMessage', ({ message, to }) => {
       console.log('sendMessage')
-      if (connectedUsers.hasOwnProperty(to)) {
+      if (usersSockets.hasOwnProperty(to)) {
         console.log('fetchMessage')
-        connectedUsers[to].emit('fetchMessage', {
+        usersSockets[to].emit('fetchMessage', {
           message,
           senderEmail: socket.email,
           senderName: socket.name,
@@ -58,8 +60,8 @@ const initializeSocketIO = (server) => {
     })
   
     socket.on('disconnect', () => {
-      delete connectedUsers[socket.email]
-      console.log(Object.keys(connectedUsers))
+      delete usersSockets[socket.email]
+      console.log(Object.keys(usersSockets))
       socket.broadcast.emit("exitUser", {
         userID: socket.id,
         email: socket.email,
