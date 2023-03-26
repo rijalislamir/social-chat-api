@@ -24,14 +24,20 @@ app.use(express.json())
 
 io.use((socket, next) => {
   const email = socket.handshake.auth.email;
+  const name = socket.handshake.auth.name;
   if (!email) {
     return next(new Error("invalid email"));
   }
   socket.email = email;
+  socket.name = name;
   next();
 });
 
+let connectedUsers = {}
+
 io.on('connection', (socket) => {
+  connectedUsers[socket.email] = socket
+  
   const users = [];
   for (let [id, socket] of io.of("/").sockets) {
     users.push({
@@ -47,6 +53,16 @@ io.on('connection', (socket) => {
   });
   
   console.log('user CONNECTED');
+
+  socket.on('sendMessage', ({ message, to }) => {
+    if (connectedUsers.hasOwnProperty(to)) {
+      connectedUsers[to].emit('fetchMessage', {
+        message,
+        senderEmail: socket.email,
+        senderName: socket.name,
+      })
+    }
+  })
 
   socket.on('disconnect', () => {
     socket.broadcast.emit("exitUser", {
