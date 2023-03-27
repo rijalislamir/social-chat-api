@@ -34,15 +34,17 @@ const initializeSocketIO = (server) => {
     const onlineUsers = [];
     for (let [id, socket] of io.of("/").sockets) {
       onlineUsers.push({
-        userID: id,
+        socketId: id,
+        name: socket.name,
         email: socket.email,
       });
     }
     socket.emit("onlineUsers", onlineUsers);
     
     socket.broadcast.emit("newUser", {
-      userID: socket.id,
+      socketId: socket.id,
       email: socket.email,
+      name: socket.name,
     });
     
     console.log('user CONNECTED');
@@ -61,10 +63,11 @@ const initializeSocketIO = (server) => {
   
     socket.on('disconnect', () => {
       delete usersSockets[socket.email]
-      console.log(Object.keys(usersSockets))
+
       socket.broadcast.emit("exitUser", {
-        userID: socket.id,
+        socketId: socket.id,
         email: socket.email,
+        name: socket.name,
       });
   
       console.log('user DISCONNECTED');
