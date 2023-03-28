@@ -12,6 +12,7 @@ const initializeSocketIO = (server) => {
   );
 
   io.use((socket, next) => {
+    const userId = socket.handshake.auth.userId;
     const email = socket.handshake.auth.email;
     const name = socket.handshake.auth.name;
 
@@ -19,6 +20,7 @@ const initializeSocketIO = (server) => {
       return next(new Error("invalid email"));
     }
 
+    socket.userId = userId;
     socket.email = email;
     socket.name = name;
     next();
@@ -28,13 +30,12 @@ const initializeSocketIO = (server) => {
   
   io.on('connection', (socket) => {
     usersSockets[socket.email] = socket
-
-    console.log(Object.keys(usersSockets))
     
     const onlineUsers = [];
     for (let [id, socket] of io.of("/").sockets) {
       onlineUsers.push({
         socketId: id,
+        userId: socket.userId,
         name: socket.name,
         email: socket.email,
       });
@@ -43,18 +44,19 @@ const initializeSocketIO = (server) => {
     
     socket.broadcast.emit("newUser", {
       socketId: socket.id,
+      userId: socket.userId,
       email: socket.email,
       name: socket.name,
     });
     
     console.log('user CONNECTED');
   
-    socket.on('sendMessage', ({ message, to }) => {
-      console.log('sendMessage')
+    socket.on('sendMessage', ({ message, to, conversationId }) => {
       if (usersSockets.hasOwnProperty(to)) {
-        console.log('fetchMessage')
         usersSockets[to].emit('fetchMessage', {
+          conversationId,
           message,
+          userId: socket.userId,
           senderEmail: socket.email,
           senderName: socket.name,
         })

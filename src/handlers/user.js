@@ -162,10 +162,44 @@ const deleteUser = (req, res) => {
   })
 }
 
+const getConversationUsers = (req, res) => {
+  try {
+    const { id } = req.params
+
+    conn.query(`
+        SELECT users.id, users.name, users.email FROM users_conversations
+        JOIN users
+        ON users_conversations.userId = users.id
+        WHERE ?
+      `,
+      { conversationId: id },
+      (err, result) => {
+        if (err) {
+          return res.status(400).send({
+            success: false,
+            message: err
+          })
+        }
+
+        return res.send({
+          success: true,
+          users: result
+        })
+      }
+    )
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      message: error
+    })
+  } 
+}
+
 module.exports = {
   getAllUsers,
   getUser,
   createUser,
   updateUser,
-  deleteUser
+  deleteUser,
+  getConversationUsers
 }

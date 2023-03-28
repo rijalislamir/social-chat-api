@@ -6,6 +6,8 @@ const { initializeSocketIO } = require('./socket')
 
 const authRoutes = require('./routes/auth')
 const userRoutes = require('./routes/user')
+const conversationRoutes = require('./routes/conversation')
+const messageRoutes = require('./routes/message')
 
 const app = express()
 const server = http.createServer(app);
@@ -18,6 +20,8 @@ app.use(express.json())
 
 app.use('/', authRoutes)
 app.use('/users', userRoutes)
+app.use('/conversations', conversationRoutes)
+app.use('/messages', messageRoutes)
 
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
