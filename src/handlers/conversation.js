@@ -95,6 +95,22 @@ const createUserConversation = (req, res) => {
   }
 }
 
+const deleteUserConversations = (req, res) => {
+  conn.query(`DELETE FROM users_conversations WHERE ?`, req.params, (err, result) => {
+    if (err) {
+      return res.status(400).send({
+        succes: false,
+        message: err
+      })
+    }
+
+    return res.send({
+      success: true,
+      ids: result
+    })
+  })
+}
+
 const deleteConversation = (req, res) => {
   const { id } = req.params
 
@@ -126,5 +142,6 @@ module.exports = {
   getUserConversations,
   createConversation,
   createUserConversation,
+  deleteUserConversations,
   deleteConversation
 }

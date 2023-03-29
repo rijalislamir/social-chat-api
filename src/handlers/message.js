@@ -58,7 +58,35 @@ const createMessage = async (req, res) => {
   }
 }
 
+const deleteUserMessages = (req, res) => {
+  try {
+    const { id } = req.params
+
+    conn.query(`DELETE FROM messages WHERE ?`, { userId: id }, (err, result) => {
+      if (err) {
+        return res.status(400).send({
+          success: false,
+          message: err
+        })
+      }
+
+      console.log(result)
+
+      return res.send({
+        success: true,
+        ids: result
+      })
+    })
+  } catch (error) {
+    return res.status(400).send({
+      success: false,
+      message: error
+    })
+  }
+}
+
 module.exports = {
   getConversationMessages,
-  createMessage
+  createMessage,
+  deleteUserMessages
 }
