@@ -29,7 +29,7 @@ const initializeSocketIO = (server) => {
   let usersSockets = {}
   
   io.on('connection', (socket) => {
-    usersSockets[socket.email] = socket
+    usersSockets[socket.userId] = socket
     
     const onlineUsers = [];
     for (let [id, socket] of io.of("/").sockets) {
