@@ -125,7 +125,7 @@ const deleteConversation = (req, res) => {
     }
 
     if (!result.affectedRows) {
-      return res.status(400).send({
+      return res.status(404).send({
         success: false,
         message: 'Conversation not found!'
       })

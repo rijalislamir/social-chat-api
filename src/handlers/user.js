@@ -108,9 +108,7 @@ const updateUser = (req, res) => {
     }
 
     if (!result.affectedRows) {
-      res.statusCode = 400
-
-      return res.send({
+      return res.status(404).send({
         success: false,
         message: 'User not found!'
       })
@@ -147,9 +145,7 @@ const deleteUser = (req, res) => {
     }
 
     if (!result.affectedRows) {
-      res.statusCode = 400
-
-      return res.send({
+      return res.status(404).send({
         success: false,
         message: 'User not found!'
       })
