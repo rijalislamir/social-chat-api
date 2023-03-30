@@ -38,8 +38,7 @@ const initializeSocketIO = (server) => {
         userId: socket.userId,
         name: socket.name,
         email: socket.email,
-        self: false,
-        isSelected: false
+        self: false
       });
     }
     socket.emit("onlineUsers", onlineUsers);
@@ -49,8 +48,7 @@ const initializeSocketIO = (server) => {
       userId: socket.userId,
       email: socket.email,
       name: socket.name,
-      self: false,
-      isSelected: false,
+      self: false
     });
     
     console.log('user CONNECTED');
