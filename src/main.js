@@ -23,6 +23,11 @@ app.use('/users', userRoutes)
 app.use('/conversations', conversationRoutes)
 app.use('/messages', messageRoutes)
 
+// Error handler
+app.use((err, req, res, next) => {
+  res.status(400).send({ success: false, message: err})
+})
+
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 })
