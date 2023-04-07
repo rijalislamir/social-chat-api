@@ -81,7 +81,7 @@ const createUser = async (req, res) => {
 
 const updateUser = (req, res) => {
   const { id } = req.params
-  const { name } = req.body
+  const { name, profilePicture } = req.body
 
   if (id !== req.user.id) return res.status(403).send({
     success: false,
@@ -97,7 +97,7 @@ const updateUser = (req, res) => {
     })
   }
 
-  conn.query('UPDATE users SET ? WHERE ?', [{ name }, { id }], (err, result) => {
+  conn.query('UPDATE users SET ? WHERE ?', [{ name, profilePicture }, { id }], (err, result) => {
     if (err) {
       res.statusCode = 400
 
