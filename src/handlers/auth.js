@@ -24,6 +24,7 @@ const login = (req, res) => {
       if (!result.length) {
         return res.status(400).send({
           success: false,
+          error: { type: 'unregistered.email' },
           message: 'Email not registered!'
         })
       }
@@ -47,7 +48,10 @@ const login = (req, res) => {
   
       return res.status(400).send({
         success: false,
-        message: 'Invalid credentials!'
+        message: 'Invalid credentials!',
+        error: {
+          type:'invalid.credential'
+        }
       })
     })
   } catch (error) {

@@ -62,7 +62,7 @@ const createUser = async (req, res) => {
       if (err) {  
         return res.status(400).send({
           success: false,
-          message: err
+          error: err
         })
       }
       
