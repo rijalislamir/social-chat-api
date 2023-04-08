@@ -53,14 +53,13 @@ const initializeSocketIO = (server) => {
     
     console.log('user CONNECTED');
   
-    socket.on('sendMessage', ({ message, to, conversationId }) => {
+    socket.on('sendMessage', ({ message, to, conversationId, users }) => {
       if (usersSockets.hasOwnProperty(to)) {
         usersSockets[to].emit('fetchMessage', {
           conversationId,
           message,
           userId: socket.userId,
-          senderEmail: socket.email,
-          senderName: socket.name,
+          users,
         })
       }
     })
