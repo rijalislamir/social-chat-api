@@ -50,8 +50,6 @@ const initializeSocketIO = (server) => {
       name: socket.name,
       self: false
     });
-    
-    console.log('user CONNECTED');
   
     socket.on('sendMessage', ({ message, to, conversationId, users }) => {
       if (usersSockets.hasOwnProperty(to)) {
@@ -72,8 +70,6 @@ const initializeSocketIO = (server) => {
         email: socket.email,
         name: socket.name,
       });
-  
-      console.log('user DISCONNECTED');
     });
   });
 }

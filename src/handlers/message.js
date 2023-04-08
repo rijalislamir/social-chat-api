@@ -5,13 +5,23 @@ const getConversationMessages = (req, res) => {
   try {
     const { id } = req.params
 
-    conn.query(`SELECT * FROM messages WHERE ? ORDER BY createdAt ASC`, { conversationId: id }, (err, result) => {
-      if (err) {
-        return res.status(400).send({
-          success: false,
-          message: err
-        })
-      }
+    conn.query(
+      `
+        SELECT messages.*, users.name as userName, users.email as userEmail
+        FROM messages
+        JOIN users
+        ON messages.userId = users.id
+        WHERE ? 
+        ORDER BY messages.createdAt ASC
+      `,
+      { conversationId: id },
+      (err, result) => {
+        if (err) {
+          return res.status(400).send({
+            success: false,
+            message: err,
+          });
+        }
 
       return res.send({
         success: true,
