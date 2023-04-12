@@ -51,13 +51,15 @@ const initializeSocketIO = (server) => {
       self: false
     });
   
-    socket.on('sendMessage', ({ message, to, conversationId, users }) => {
+    socket.on('sendMessage', ({ message, to, conversationId, users, userEmail, userName }) => {
       if (usersSockets.hasOwnProperty(to)) {
         usersSockets[to].emit('fetchMessage', {
           conversationId,
           message,
           userId: socket.userId,
           users,
+          userEmail,
+          userName
         })
       }
     })
